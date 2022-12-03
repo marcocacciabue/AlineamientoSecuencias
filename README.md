@@ -365,3 +365,17 @@ el genoma de un virus.
 ● Recorrer el genoma y reconocer los segmentos de mayor profundidad:
 
 ![mapeo en tablet](man/images/tablet_2.png)
+
+### 7. Análisis de variantes
+
+``` bash
+samtools view -@ 4 -h -F 4 -b 03_Mapped/alineamiento.sorted.bam > 03_Mapped/alineamiento.map.bam 
+
+samtools index -@ 4  03_Mapped/alineamiento.map.bam  03_Mapped/alineamiento.map.bam.bai
+```
+
+``` bash
+mkdir 04_variants
+
+lofreq call-parallel --pp-threads 4 -f Referencia/A01L.fasta 03_Mapped/alineamiento.map.bam -o 04_variants/variants.vcf
+```

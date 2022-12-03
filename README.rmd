@@ -298,3 +298,30 @@ Para abrir Tablet lo podemos hacer desde el acceso directo en escritorio (tiene 
 
 ![mapeo en tablet](man/images/tablet_2.png)
 
+### 7.	Análisis de variantes
+
+
+
+
+```{bash, eval=FALSE}
+
+samtools view -@ 4 -h -F 4 -b 03_Mapped/alineamiento.sorted.bam > 03_Mapped/alineamiento.map.bam 
+
+samtools index -@ 4  03_Mapped/alineamiento.map.bam  03_Mapped/alineamiento.map.bam.bai
+
+
+
+```
+
+
+
+
+
+```{bash, eval=FALSE}
+
+mkdir 04_variants
+
+lofreq call-parallel --pp-threads 4 -f Referencia/A01L.fasta 03_Mapped/alineamiento.map.bam -o 04_variants/variants.vcf
+
+
+```
