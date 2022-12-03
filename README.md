@@ -306,7 +306,7 @@ flagstat para que nos de un resumen de como estuvo el mapeo de las
 secuencias.
 
 ``` bash
-samtools view -S -b 03_Mapped/alineamiento.sam > 03_Mapped/alineamiento.bam
+samtools view -S -bT Referencia/A01L.fasta 03_Mapped/alineamiento.sam > 03_Mapped/alineamiento.bam
 
 samtools flagstat 03_Mapped/alineamiento.bam > 03_Mapped/alineamiento.txt
 ```

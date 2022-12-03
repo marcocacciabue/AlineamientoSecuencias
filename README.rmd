@@ -239,7 +239,7 @@ Una vez que termine bowtie2, convertiremos el archivo de mapeo .sam en el format
 
 ```{bash, eval=FALSE}
 
-samtools view -S -b 03_Mapped/alineamiento.sam > 03_Mapped/alineamiento.bam
+samtools view -S -bT Referencia/A01L.fasta 03_Mapped/alineamiento.sam > 03_Mapped/alineamiento.bam
 
 samtools flagstat 03_Mapped/alineamiento.bam > 03_Mapped/alineamiento.txt
 
