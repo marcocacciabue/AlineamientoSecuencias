@@ -41,15 +41,19 @@ y esperar a que la imagen se descargue. Esto solo se corre la primera vez, o cad
 
 Cuando la descarga este completa correr, segun tu sistema operativo:
 
+Para windows correr
+
 ```{bash, eval=FALSE}
-#Para windows correr
+
 docker run -it --volume %cd%:/nexus cacciabue/pir2022:latest
 
 
 ```
 
+Para Linux correr
+
 ```{bash, eval=FALSE}
-#Para Linux correr
+
 docker run -it --volume $(pwd):/nexus cacciabue/pir2022:latest
 ```
 
@@ -219,7 +223,7 @@ Una vez armados los índices ejecutaremos el algoritmo bowtie2 para mapear los r
 Por último, como bowtie2 imprime el resultado en pantalla, lo guardamos con el símbolo > para que nos quede en el archivo que deseamos (en este caso ../04_Mapped/ sub_sar89-2015.sam). Por defecto este algoritmo genera el alineamiento en formato SAM (Sequence Alignment Map).
 
 ```{bash, eval=FALSE}
-mkdir 04_Mapped
+mkdir 03_Mapped
 
 bowtie2 -p 4 -x Referencia/ref_TP -1 02_Trimmed/1.fq -2 02_Trimmed/2.fq > 03_Mapped/alineamiento.sam
 
