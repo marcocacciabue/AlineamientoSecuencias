@@ -377,5 +377,7 @@ samtools index -@ 4  03_Mapped/alineamiento.map.bam  03_Mapped/alineamiento.map.
 ``` bash
 mkdir 04_variants
 
-lofreq call-parallel --pp-threads 4 -f Referencia/A01L.fasta 03_Mapped/alineamiento.map.bam -o 04_variants/variants.vcf
+lofreq faidx Referencia/A01L.fasta 
+
+lofreq call-parallel --force-overwrite --pp-threads 4 -f Referencia/A01L.fasta 03_Mapped/alineamiento.map.bam -o 04_variants/variants.vcf
 ```
