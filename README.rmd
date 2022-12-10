@@ -41,15 +41,19 @@ y esperar a que la imagen se descargue. Esto solo se corre la primera vez, o cad
 
 Cuando la descarga este completa correr, segun tu sistema operativo:
 
+Para windows correr
+
 ```{bash, eval=FALSE}
-#Para windows correr
+
 docker run -it --volume %cd%:/nexus cacciabue/pir2022:latest
 
 
 ```
 
+Para Linux correr
+
 ```{bash, eval=FALSE}
-#Para Linux correr
+
 docker run -it --volume $(pwd):/nexus cacciabue/pir2022:latest
 ```
 
@@ -219,7 +223,7 @@ Una vez armados los índices ejecutaremos el algoritmo bowtie2 para mapear los r
 Por último, como bowtie2 imprime el resultado en pantalla, lo guardamos con el símbolo > para que nos quede en el archivo que deseamos (en este caso ../04_Mapped/ sub_sar89-2015.sam). Por defecto este algoritmo genera el alineamiento en formato SAM (Sequence Alignment Map).
 
 ```{bash, eval=FALSE}
-mkdir 04_Mapped
+mkdir 03_Mapped
 
 bowtie2 -p 4 -x Referencia/ref_TP -1 02_Trimmed/1.fq -2 02_Trimmed/2.fq > 03_Mapped/alineamiento.sam
 
@@ -235,7 +239,7 @@ Una vez que termine bowtie2, convertiremos el archivo de mapeo .sam en el format
 
 ```{bash, eval=FALSE}
 
-samtools view -S -b 03_Mapped/alineamiento.sam > 03_Mapped/alineamiento.bam
+samtools view -S -bT Referencia/A01L.fasta 03_Mapped/alineamiento.sam > 03_Mapped/alineamiento.bam
 
 samtools flagstat 03_Mapped/alineamiento.bam > 03_Mapped/alineamiento.txt
 
@@ -294,3 +298,32 @@ Para abrir Tablet lo podemos hacer desde el acceso directo en escritorio (tiene 
 
 ![mapeo en tablet](man/images/tablet_2.png)
 
+### 7.	Análisis de variantes
+
+
+
+
+```{bash, eval=FALSE}
+
+samtools view -@ 4 -h -F 4 -b 03_Mapped/alineamiento.sorted.bam > 03_Mapped/alineamiento.map.bam 
+
+samtools index -@ 4  03_Mapped/alineamiento.map.bam  03_Mapped/alineamiento.map.bam.bai
+
+
+
+```
+
+
+
+
+
+```{bash, eval=FALSE}
+
+mkdir 04_variants
+
+# si hace falta generar indice de la referencia correr: lofreq faidx Referencia/A01L.fasta 
+
+lofreq call-parallel --force-overwrite --pp-threads 4 -f Referencia/A01L.fasta 03_Mapped/alineamiento.map.bam -o 04_variants/variants.vcf
+
+
+```

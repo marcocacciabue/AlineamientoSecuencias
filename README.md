@@ -35,13 +35,15 @@ imagen disponibles.
 
 Cuando la descarga este completa correr, segun tu sistema operativo:
 
+Para windows correr
+
 ``` bash
-#Para windows correr
 docker run -it --volume %cd%:/nexus cacciabue/pir2022:latest
 ```
 
+Para Linux correr
+
 ``` bash
-#Para Linux correr
 docker run -it --volume $(pwd):/nexus cacciabue/pir2022:latest
 ```
 
@@ -58,11 +60,11 @@ Primero, lo que vamos a hacer es ver en qué directorio estamos
 posicionados utilizando el comando pwd (print working directory). Luego
 de cada comando tenemos que presionar ENTER. Para ver cuál es el
 contenido del directorio podemos utilizar el comando ls. Allí vamos a
-visualizar un listado de carpetas, todas ellas aparecen en :green\_book:
+visualizar un listado de carpetas, todas ellas aparecen en :green_book:
 verde.
 
 Los archivos con los que vamos a trabajar se encuentran en la carpeta
-FMDV\_work. Entonces, para cambiar el directorio de trabajo, usamos el
+FMDV_work. Entonces, para cambiar el directorio de trabajo, usamos el
 comando cd (change directory) hasta llegar a la carpeta en la que vamos
 a trabajar.
 
@@ -96,7 +98,7 @@ cd SRAdata
 ls
 ```
 
-SRR20291897\_1.fastq SRR20291897\_2.fastq
+SRR20291897_1.fastq SRR20291897_2.fastq
 
 Nota1: PRESTEN ATENCIÓN AL USO DE MAYÚSCULAS Y MINÚSCULAS al escribir,
 porque Bash es sensible a esto (no es lo mismo SRAdata que sradata, que
@@ -143,7 +145,7 @@ fastqc SRAdata/*.fastq -o 01_Quality_check/
 
 Nota2: Podemos ver que a fastqc le indicamos dos parámetros, las
 secuencias a analizar y la carpeta donde queremos que guarde los
-resultados (en este caso en 01\_Quality\_check/). Utilizamos el comodín
+resultados (en este caso en 01_Quality_check/). Utilizamos el comodín
 \*, que indica “cualquier nombre”, y seguido de .fastq, va a llamar a
 todos los archivos que terminen .fastq y de esta manera analiza todas
 las secuencias con un solo comando.
@@ -240,7 +242,7 @@ mkdir 02_Trimmed
 bbduk.sh in1=SRAdata/SRR20291897_1.fastq out1=02_Trimmed/1.fq in2=SRAdata/SRR20291897_2.fastq out2=02_Trimmed/2.fq ref=/programs/bbmap/resources/adapters.fa ktrim=r k=23 mink=11 hdist=1 tpe tbo qtrim=rl trimq=25 minlen=100 maq=25
 ```
 
-Luego de que bdduk haya corrido, ir a la carpeta 02\_Trimmed y ver si
+Luego de que bdduk haya corrido, ir a la carpeta 02_Trimmed y ver si
 efectivamente se crearon los archivos, inspeccione alguno de ellos con
 el programa FastqC.
 
@@ -282,18 +284,17 @@ bowtie2-build). ● -1: El nombre de las secuencias forward a mapear. ●
 -2: El nombre de las secuencias reverse a mapear.
 
 Por último, como bowtie2 imprime el resultado en pantalla, lo guardamos
-con el símbolo &gt; para que nos quede en el archivo que deseamos (en
-este caso ../04\_Mapped/ sub\_sar89-2015.sam). Por defecto este
-algoritmo genera el alineamiento en formato SAM (Sequence Alignment
-Map).
+con el símbolo \> para que nos quede en el archivo que deseamos (en este
+caso ../04_Mapped/ sub_sar89-2015.sam). Por defecto este algoritmo
+genera el alineamiento en formato SAM (Sequence Alignment Map).
 
 ``` bash
-mkdir 04_Mapped
+mkdir 03_Mapped
 
 bowtie2 -p 4 -x Referencia/ref_TP -1 02_Trimmed/1.fq -2 02_Trimmed/2.fq > 03_Mapped/alineamiento.sam
 ```
 
-Ir a la carpeta 04\_Mapped e inspeccionar el archivo SAM recientemente
+Ir a la carpeta 04_Mapped e inspeccionar el archivo SAM recientemente
 creado con el comando less -S. Para salir apretar la tecla q.
 
 ### 5. Estadísticas del mapeo
@@ -306,12 +307,12 @@ flagstat para que nos de un resumen de como estuvo el mapeo de las
 secuencias.
 
 ``` bash
-samtools view -S -b 03_Mapped/alineamiento.sam > 03_Mapped/alineamiento.bam
+samtools view -S -bT Referencia/A01L.fasta 03_Mapped/alineamiento.sam > 03_Mapped/alineamiento.bam
 
 samtools flagstat 03_Mapped/alineamiento.bam > 03_Mapped/alineamiento.txt
 ```
 
-En el archivo 04\_Mapped/alineamiento.txt, se encuentra guardado el
+En el archivo 04_Mapped/alineamiento.txt, se encuentra guardado el
 resumen hecho por flagstat. Aquí podemos ver que mapearon 16406
 secuencias (que corresponden al 2.62% del total) y solo el 1.17%
 mapearon correctamente el par forward/reverse.
@@ -321,7 +322,7 @@ mapearon correctamente el par forward/reverse.
 625588 + 0 paired in sequencing 312794 + 0 read1 312794 + 0 read2 7340 +
 0 properly paired (1.17% : N/A) 7954 + 0 with itself and mate mapped
 8452 + 0 singletons (1.35% : N/A) 0 + 0 with mate mapped to a different
-chr 0 + 0 with mate mapped to a different chr (mapQ&gt;=5)
+chr 0 + 0 with mate mapped to a different chr (mapQ\>=5)
 
 ### 6. Visualización del mapeo
 
@@ -365,3 +366,19 @@ el genoma de un virus.
 ● Recorrer el genoma y reconocer los segmentos de mayor profundidad:
 
 ![mapeo en tablet](man/images/tablet_2.png)
+
+### 7. Análisis de variantes
+
+``` bash
+samtools view -@ 4 -h -F 4 -b 03_Mapped/alineamiento.sorted.bam > 03_Mapped/alineamiento.map.bam 
+
+samtools index -@ 4  03_Mapped/alineamiento.map.bam  03_Mapped/alineamiento.map.bam.bai
+```
+
+``` bash
+mkdir 04_variants
+
+# si hace falta generar indice de la referencia correr: lofreq faidx Referencia/A01L.fasta 
+
+lofreq call-parallel --force-overwrite --pp-threads 4 -f Referencia/A01L.fasta 03_Mapped/alineamiento.map.bam -o 04_variants/variants.vcf
+```
