@@ -1,4 +1,5 @@
-Marco Cacciabue
+Marco Cacciabue (basado en gran medida en el trabajo de Natalia Aguirre
+y Pablo Aguilera)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
